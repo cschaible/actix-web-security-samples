@@ -1,0 +1,46 @@
+.container {
+  padding-bottom: 2rem;
+}
+
+h2 {
+  margin-bottom: 2rem;
+}
+
+.custom-card-shadow {
+  box-shadow: 0 1px 10px 0 rgba(0, 0, 0, 0.15);
+}
+
+.card-body {
+  padding: 1rem 1rem .25rem 1rem;
+}
+
+.card-footer {
+  border-top: unset;
+  padding-bottom: .75rem;
+}
+
+.card-icon {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.card-icon i {
+  font-size: 2rem;
+  display: flex;
+  align-items: center;
+  margin-right: .5rem;
+}
+
+.card-icon span {
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.card-text {
+  min-height: 40px;
+}
+
+.custom-card-header {
+  margin-bottom: 1rem;
+}

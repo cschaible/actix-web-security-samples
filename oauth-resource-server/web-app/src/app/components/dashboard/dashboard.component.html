@@ -1,0 +1,47 @@
+<div class="container">
+  <h2>Welcome {{username}}</h2>
+  <div class="row row-cols-1 row-cols-md-3 g-4">
+    <div class="col" *ngIf="admin">
+      <div class="card custom-card-shadow">
+        <div class="card-body">
+          <div class="custom-card-header card-icon">
+            <i class="bi bi-person-circle"></i>
+            <span>User management</span>
+          </div>
+          <p class="card-text">
+            As an administrator you have the ability to view and edit user accounts.
+          </p>
+        </div>
+        <div class="card-footer"><a routerLink="users" class="btn btn-dark">Edit</a></div>
+      </div>
+    </div>
+    <div *ngIf="loggedIn" class="col">
+      <div class="card custom-card-shadow">
+        <div class="card-body">
+          <div class="custom-card-header card-icon">
+            <i class="bi bi-gear-wide"></i>
+            <span>Account settings</span>
+          </div>
+          <p class="card-text">
+            Edit your account details or delete your account.
+          </p>
+        </div>
+        <div class="card-footer"><a routerLink="account" class="btn btn-dark">Edit</a></div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card custom-card-shadow">
+        <div class="card-body">
+          <div class="custom-card-header card-icon">
+            <i class="bi bi-info-circle-fill"></i>
+            <span>About</span>
+          </div>
+          <p class="card-text">
+            Learn more about this sample application
+          </p>
+        </div>
+        <div class="card-footer"><a routerLink="about" class="btn btn-dark">Show</a></div>
+      </div>
+    </div>
+  </div>
+</div>

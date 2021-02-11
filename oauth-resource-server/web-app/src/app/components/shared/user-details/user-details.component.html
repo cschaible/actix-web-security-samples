@@ -1,0 +1,29 @@
+<div class="container">
+  <h1 class="margin-bottom-2rem">
+    {{title}}
+  </h1>
+  <form [formGroup]="registerFormGroup" novalidate ngxsForm="register.registerForm" (ngSubmit)="sendRegistration()">
+    <div class="signup-input register-input margin-bottom-1rem">
+      <mat-form-field class="signup-input-field register-input-field">
+        <input matInput #firstName maxlength="256" placeholder="First name" formControlName="firstName" required>
+        <mat-hint align="end">{{firstName.value.length}} / 256</mat-hint>
+        <mat-error [hidden]="!registerFormGroup.controls['firstName'].errors">
+          First name is required
+        </mat-error>
+      </mat-form-field>
+    </div>
+    <div class="signup-input register-input margin-bottom-1rem">
+      <mat-form-field class="signup-input-field register-input-field">
+        <input matInput #lastName maxlength="256" placeholder="Last name" formControlName="lastName" required>
+        <mat-hint align="end">{{lastName.value.length}} / 256</mat-hint>
+        <mat-error [hidden]="!registerFormGroup.controls['lastName'].errors">
+          Last name is required
+        </mat-error>
+      </mat-form-field>
+    </div>
+    <button class="btn btn-outline-dark margin-bottom-1rem margin-right-05rem" type="submit"
+            [disabled]="!registerFormGroup.valid">{{btnSaveTitle}}</button>
+    <button class="btn btn-outline-dark margin-bottom-1rem" type="submit" (click)="deleteAccount()"
+            *ngIf="btnDeleteEnabled">{{btnDeleteTitle}}</button>
+  </form>
+</div>

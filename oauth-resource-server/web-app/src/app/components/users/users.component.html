@@ -1,0 +1,33 @@
+<div class="container">
+  <h2>Users</h2>
+  <table class="table table-striped">
+    <thead>
+    <tr>
+      <th scope="col">Firstname</th>
+      <th scope="col">Lastname</th>
+      <th scope="col">Admin</th>
+      <th scope="col">Delete</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let user of users">
+      <td>
+        <div class="content-middle">{{user.firstName}}</div>
+      </td>
+      <td>
+        <div class="content-middle">{{user.lastName}}</div>
+      </td>
+      <td>
+        <div class="content-middle">
+          <mat-slide-toggle [checked]="user.admin" (change)="setAdmin($event.checked, user)"
+                            [disabled]="isActive(user)"></mat-slide-toggle>
+        </div>
+      </td>
+      <td>
+        <button mat-mini-fab (click)="delete(user)" [disabled]="isActive(user)">
+          <i class="bi bi-trash-fill"></i>
+        </button>
+    </tr>
+    </tbody>
+  </table>
+</div>

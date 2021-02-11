@@ -1,0 +1,54 @@
+version: "3"
+services:
+  pgadmin:
+    image: dpage/pgadmin4
+    hostname: pgadmin
+    container_name: pgadmin
+    ports:
+      - "5433:5433"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: administr@t.r
+      PGADMIN_DEFAULT_PASSWORD: secret
+      PGADMIN_LISTEN_PORT: 5433
+    depends_on:
+      - postgresql
+  
+  postgresql:
+    image: postgres
+    hostname: postgres
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secret
+      PGPASSWORD: secret
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - ./create-databases.sh:/docker-entrypoint-initdb.d/create-databases.sh:ro
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    environment:
+      DB_VENDOR: POSTGRES
+      DB_ADDR: postgresql
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_SCHEMA: public
+      DB_PASSWORD: secret
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: secret
+      KEYCLOAK_IMPORT: /tmp/app-realm.json
+      # Uncomment the line below if you want to specify JDBC parameters. The parameter below is just an example, and it shouldn't be used in production without knowledge. It is highly recommended that you read the PostgreSQL JDBC driver documentation in order to use it.
+      #JDBC_PARAMS: "ssl=true"
+    ports:
+      - 8080:8080
+    volumes:
+      - ./app-realm.json:/tmp/app-realm.json:ro
+    depends_on:
+      - postgresql
+    
