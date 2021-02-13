@@ -21,6 +21,7 @@ use url::Url;
 use api::controller;
 use security::user_details_service::JwtUserDetailsServiceImpl;
 
+use crate::error::ApplicationError;
 use crate::repository::user_repository::{UserRepository, UserRepositoryImpl};
 
 mod api;
@@ -72,6 +73,8 @@ async fn main() -> anyhow::Result<()> {
     let user_repository: Box<dyn UserRepository> =
         Box::new(UserRepositoryImpl::new(Arc::new(db_pool)));
 
+    let jwks_url = env::var("JWKS_URL").expect("JWKS_URL env variable not set");
+    let jwks = load_default_rsa_jwks(jwks_url, Algorithm::RS256).map_err(|e| ApplicationError::JwkError(e))?;
 
     HttpServer::new(move || {
         let cors = Cors::default()
@@ -91,10 +94,7 @@ async fn main() -> anyhow::Result<()> {
 
         let provider_manager = ProviderManager::new(vec![Box::new(authentication_provider)]);
 
-        let jwks_url = env::var("JWKS_URL").expect("JWKS_URL env variable not set");
-
-        let authentication_extractor =
-            BearerAuthenticationExtractor::new(load_default_rsa_jwks(jwks_url, Algorithm::RS256));
+        let authentication_extractor = BearerAuthenticationExtractor::new(jwks.clone());
 
         let authentication_middleware =
             HttpAuthenticationMiddleware::new(

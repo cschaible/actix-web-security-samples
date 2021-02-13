@@ -11,7 +11,7 @@ license = "MIT OR Apache-2.0"
 actix-cors = "0.5" # MIT OR Apache-2.0
 actix-http = "2.2" # MIT OR Apache-2.0
 actix-web = "3" # MIT OR Apache-2.0
-actix-web-security = { version = "0.1.0-alpha.2", features = ["jwk-default-loader"] } # MIT OR Apache-2.0
+actix-web-security = { git = "https://github.com/cschaible/actix-web-security", features = ["jwk-default-loader"] } # MIT OR Apache-2.0
 anyhow = "1.0" # MIT OR Apache-2.0
 async-trait = "0.1" # MIT OR Apache-2.0
 derive_more = "0.99" # MIT

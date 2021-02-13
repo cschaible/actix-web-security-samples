@@ -1,6 +1,7 @@
 use actix_http::http::{header, StatusCode};
 use actix_web::{error, HttpResponse};
 use actix_web::dev::HttpResponseBuilder;
+use actix_web_security::authentication::error::error_type::JwkLoaderError;
 use derive_more::{Display, Error};
 
 #[derive(Debug, Display, Error)]
@@ -19,9 +20,10 @@ pub enum CustomDatabaseError {
 
 #[derive(Debug, Display, Error)]
 pub enum ApplicationError {
+    AuthorizeError(AuthorizationError),
     CustomDbError(CustomDatabaseError),
     DbError(sqlx::Error),
-    AuthorizeError(AuthorizationError),
+    JwkError(JwkLoaderError),
 }
 
 impl error::ResponseError for ApplicationError {
@@ -33,6 +35,10 @@ impl error::ResponseError for ApplicationError {
 
     fn status_code(&self) -> StatusCode {
         match self {
+            ApplicationError::AuthorizeError(auth_error) => match auth_error {
+                AuthorizationError::NotAdmin => StatusCode::FORBIDDEN,
+                AuthorizationError::NotFound => StatusCode::NOT_FOUND,
+            },
             ApplicationError::CustomDbError(db_error) => match db_error {
                 CustomDatabaseError::Conflict => StatusCode::CONFLICT,
             },
@@ -53,10 +59,12 @@ impl error::ResponseError for ApplicationError {
                 sqlx::Error::Migrate(_) => StatusCode::INTERNAL_SERVER_ERROR,
                 _ => StatusCode::INTERNAL_SERVER_ERROR,
             },
-            ApplicationError::AuthorizeError(auth_error) => match auth_error {
-                AuthorizationError::NotAdmin => StatusCode::FORBIDDEN,
-                AuthorizationError::NotFound => StatusCode::NOT_FOUND,
-            },
+            ApplicationError::JwkError(jwk_error) => match jwk_error {
+                JwkLoaderError::InvalidJsonResponse => StatusCode::INTERNAL_SERVER_ERROR,
+                JwkLoaderError::InvalidKeyFile => StatusCode::INTERNAL_SERVER_ERROR,
+                JwkLoaderError::JwksCouldNotBeDownloaded => StatusCode::INTERNAL_SERVER_ERROR,
+                JwkLoaderError::KeyFileCouldNotBeRead => StatusCode::INTERNAL_SERVER_ERROR,
+            }
         }
     }
 }
@@ -76,5 +84,11 @@ impl From<sqlx::Error> for ApplicationError {
 impl From<CustomDatabaseError> for ApplicationError {
     fn from(e: CustomDatabaseError) -> Self {
         ApplicationError::CustomDbError(e)
+    }
+}
+
+impl From<JwkLoaderError> for ApplicationError {
+    fn from(e: JwkLoaderError) -> Self {
+        ApplicationError::JwkError(e)
     }
 }
