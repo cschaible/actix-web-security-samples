@@ -1,6 +1,6 @@
 use actix_http::http::{header, StatusCode};
-use actix_web::{error, HttpResponse};
 use actix_web::dev::HttpResponseBuilder;
+use actix_web::{error, HttpResponse};
 use actix_web_security::authentication::error::error_type::JwkLoaderError;
 use derive_more::{Display, Error};
 
@@ -64,7 +64,7 @@ impl error::ResponseError for ApplicationError {
                 JwkLoaderError::InvalidKeyFile => StatusCode::INTERNAL_SERVER_ERROR,
                 JwkLoaderError::JwksCouldNotBeDownloaded => StatusCode::INTERNAL_SERVER_ERROR,
                 JwkLoaderError::KeyFileCouldNotBeRead => StatusCode::INTERNAL_SERVER_ERROR,
-            }
+            },
         }
     }
 }

@@ -1,9 +1,9 @@
 use std::future::Future;
 use std::pin::Pin;
 
-use actix_web::{Error, FromRequest, HttpRequest};
 use actix_web::dev::Payload;
 use actix_web::dev::PayloadStream;
+use actix_web::{Error, FromRequest, HttpRequest};
 use actix_web_security::authentication::error::error_type::AuthenticationError;
 use actix_web_security::user_details::UserDetails;
 
@@ -12,7 +12,7 @@ use crate::model::user::User;
 
 impl FromRequest for User {
     type Error = Error;
-    type Future = Pin<Box<dyn Future<Output=Result<Self, Error>>>>;
+    type Future = Pin<Box<dyn Future<Output = Result<Self, Error>>>>;
     type Config = ();
 
     fn from_request(req: &HttpRequest, _payload: &mut Payload<PayloadStream>) -> Self::Future {
@@ -39,7 +39,7 @@ impl FromRequest for User {
 
 impl FromRequest for UnregisteredUser {
     type Error = Error;
-    type Future = Pin<Box<dyn Future<Output=Result<Self, Error>>>>;
+    type Future = Pin<Box<dyn Future<Output = Result<Self, Error>>>>;
     type Config = ();
 
     fn from_request(req: &HttpRequest, _payload: &mut Payload<PayloadStream>) -> Self::Future {

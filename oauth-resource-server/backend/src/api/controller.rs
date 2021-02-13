@@ -1,25 +1,25 @@
 use std::sync::Arc;
 
-use actix_web::{HttpResponse, Responder};
 use actix_web::delete;
 use actix_web::get;
 use actix_web::post;
 use actix_web::put;
-use actix_web::web::{Json, Path};
 use actix_web::web::Data;
+use actix_web::web::{Json, Path};
+use actix_web::{HttpResponse, Responder};
 use actix_web_security::user_details::UserDetails;
 
-use crate::api::Identifier;
 use crate::api::request::converter::{
     convert_to_new_user, convert_to_user, convert_to_user_as_admin,
 };
 use crate::api::request::resource::{
     CreateUserResource, UpdateAdminUserResource, UpdateUserResource,
 };
-use crate::api::response::resources::{UserListResource, UserResource};
 use crate::api::response::resources::UnregisteredUserResource;
-use crate::error::{ApplicationError, AuthorizationError, CustomDatabaseError};
+use crate::api::response::resources::{UserListResource, UserResource};
+use crate::api::Identifier;
 use crate::error::ApplicationError::AuthorizeError;
+use crate::error::{ApplicationError, AuthorizationError, CustomDatabaseError};
 use crate::model::unregistered_user::UnregisteredUser;
 use crate::model::user::User;
 use crate::repository::user_repository::UserRepository;

@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use sqlx::{Error, Pool, Postgres, query, query_as};
+use sqlx::{query, query_as, Error, Pool, Postgres};
 use uuid::Uuid;
 
 use crate::model::user::{NewUser, User};
@@ -21,8 +21,8 @@ pub trait UserRepositoryClone: Send + Sync {
 }
 
 impl<U> UserRepositoryClone for U
-    where
-        U: 'static + UserRepository + Clone,
+where
+    U: 'static + UserRepository + Clone,
 {
     fn clone_box(&self) -> Box<dyn UserRepository> {
         Box::new(self.clone())
@@ -63,12 +63,12 @@ impl UserRepository for UserRepositoryImpl {
                 values (1, $1,$2,$3,$4, false)
                 returning *"#,
         )
-            .bind(&p_user.identifier)
-            .bind(&p_user.first_name)
-            .bind(&p_user.last_name)
-            .bind(&p_user.user_id)
-            .fetch_one(&mut tx)
-            .await?;
+        .bind(&p_user.identifier)
+        .bind(&p_user.first_name)
+        .bind(&p_user.last_name)
+        .bind(&p_user.user_id)
+        .fetch_one(&mut tx)
+        .await?;
 
         tx.commit().await?;
 
@@ -88,14 +88,14 @@ impl UserRepository for UserRepositoryImpl {
                 where identifier = $5 and version = $6
                 returning *"#,
         )
-            .bind(&p_user.version + 1)
-            .bind(&p_user.first_name)
-            .bind(&p_user.last_name)
-            .bind(&p_user.admin)
-            .bind(&p_user.identifier)
-            .bind(&p_user.version)
-            .fetch_one(&mut tx)
-            .await?;
+        .bind(&p_user.version + 1)
+        .bind(&p_user.first_name)
+        .bind(&p_user.last_name)
+        .bind(&p_user.admin)
+        .bind(&p_user.identifier)
+        .bind(&p_user.version)
+        .fetch_one(&mut tx)
+        .await?;
 
         tx.commit().await?;
 
