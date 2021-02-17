@@ -19,11 +19,9 @@ dotenv = "0.15" # MIT
 env_logger = "0.8" # MIT/Apache-2.0
 jsonwebtoken = "7.2" # MIT
 log = "0.4" # MIT OR Apache-2.0
-refinery = { version = "0.5", features = ["postgres"] } # MIT
 serde = "1" # MIT OR Apache-2.0
 serde_json = "1" # MIT OR Apache-2.0
-sqlx = { version = "0.4", features = ["runtime-actix-native-tls", "postgres", "uuid", "chrono"] } # MIT OR Apache-2.0
-url = "2.2" # MIT/Apache-2.0
+sqlx = { version = "0.4", features = ["runtime-actix-native-tls", "postgres", "uuid", "migrate"] } # MIT OR Apache-2.0
 uuid = { version = "0.8", features = ["serde", "v4"] } # Apache-2.0 OR MIT
 
 # Overwrite version to prevent build errors caused by funty 1.2.0

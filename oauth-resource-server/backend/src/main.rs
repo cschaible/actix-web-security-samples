@@ -2,8 +2,7 @@ use std::env;
 use std::sync::Arc;
 
 use actix_cors::Cors;
-use actix_web::error::BlockingError;
-use actix_web::{web, App, HttpServer};
+use actix_web::{App, HttpServer};
 use actix_web_security::authentication::endpoint_matcher::AllEndpointsMatcher;
 use actix_web_security::authentication::middleware::HttpAuthenticationMiddleware;
 use actix_web_security::authentication::scheme::bearer::jwk::default_jwk_loader::load_default_rsa_jwks;
@@ -11,12 +10,9 @@ use actix_web_security::authentication::scheme::bearer::jwt::authentication_prov
 use actix_web_security::authentication::scheme::bearer::jwt::header_extractor::BearerAuthenticationExtractor;
 use actix_web_security::authentication::ProviderManager;
 use jsonwebtoken::Algorithm;
-use log::info;
 use log::LevelFilter;
-use refinery::config::{Config, ConfigDbType};
 use sqlx::postgres::PgPoolOptions;
-use sqlx::{Pool, Postgres};
-use url::Url;
+use sqlx::{migrate, migrate::Migrator, Pool, Postgres};
 
 use api::controller;
 use security::user_details_service::JwtUserDetailsServiceImpl;
@@ -30,29 +26,7 @@ mod model;
 mod repository;
 pub mod security;
 
-mod embedded {
-    use refinery::embed_migrations;
-
-    embed_migrations!();
-}
-
-async fn migrate(url: String) -> Result<(), BlockingError<anyhow::Error>> {
-    web::block(move || {
-        let parsed_url = Url::parse(url.as_str())?;
-
-        let mut connection = Config::new(ConfigDbType::Postgres)
-            .set_db_host(parsed_url.host_str().unwrap())
-            .set_db_name(&parsed_url.path().to_string()[1..])
-            .set_db_pass(parsed_url.password().unwrap())
-            .set_db_port(&format!("{}", parsed_url.port().unwrap()))
-            .set_db_user(parsed_url.username());
-
-        info!("Migrate Database");
-        embedded::migrations::runner().run(&mut connection)?;
-        Ok(())
-    })
-    .await
-}
+static MIGRATOR: Migrator = migrate!("./migrations");
 
 #[actix_web::main]
 async fn main() -> anyhow::Result<()> {
@@ -64,11 +38,9 @@ async fn main() -> anyhow::Result<()> {
     env_logger::builder()
         .filter(Some("actix_oauth_example"), LevelFilter::Info)
         .filter(Some("actix_server::builder"), LevelFilter::Info)
-        .filter(Some("refinery_core::traits"), LevelFilter::Info)
-        .filter(Some("refinery_core::traits::sync"), LevelFilter::Info)
         .init();
 
-    let db_pool = init_db_and_migrate().await?;
+    let db_pool = init_db_and_migrate(&MIGRATOR).await?;
     let user_repository: Box<dyn UserRepository> =
         Box::new(UserRepositoryImpl::new(Arc::new(db_pool)));
 
@@ -121,14 +93,16 @@ async fn main() -> anyhow::Result<()> {
     Ok(())
 }
 
-async fn init_db_and_migrate() -> Result<Pool<Postgres>, anyhow::Error> {
+async fn init_db_and_migrate(migrator: &Migrator) -> Result<Pool<Postgres>, anyhow::Error> {
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL env variable not set");
 
-    migrate(database_url.clone()).await?;
-
-    Ok(PgPoolOptions::new()
+    let pool = PgPoolOptions::new()
         .max_connections(15)
         .min_connections(5)
         .connect(&database_url)
-        .await?)
+        .await?;
+
+    migrator.run(&pool).await?;
+
+    Ok(pool)
 }
