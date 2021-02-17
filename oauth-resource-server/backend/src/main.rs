@@ -41,8 +41,7 @@ async fn main() -> anyhow::Result<()> {
         .init();
 
     let db_pool = init_db_and_migrate(&MIGRATOR).await?;
-    let user_repository: Box<dyn UserRepository> =
-        Box::new(UserRepositoryImpl::new(Arc::new(db_pool)));
+    let user_repository: Box<dyn UserRepository> = Box::new(UserRepositoryImpl::new(db_pool));
 
     let jwks_url = env::var("JWKS_URL").expect("JWKS_URL env variable not set");
     let jwks =

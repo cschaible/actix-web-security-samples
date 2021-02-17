@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use async_trait::async_trait;
 use sqlx::{query, query_as, Error, Pool, Postgres};
 use uuid::Uuid;
@@ -37,11 +35,11 @@ impl Clone for Box<dyn UserRepository> {
 
 #[derive(Clone)]
 pub struct UserRepositoryImpl {
-    pool: Arc<Pool<Postgres>>,
+    pool: Pool<Postgres>,
 }
 
 impl UserRepositoryImpl {
-    pub fn new(pool: Arc<Pool<Postgres>>) -> UserRepositoryImpl {
+    pub fn new(pool: Pool<Postgres>) -> UserRepositoryImpl {
         UserRepositoryImpl { pool }
     }
 }
@@ -105,7 +103,7 @@ impl UserRepository for UserRepositoryImpl {
     async fn find_by_user_id(&self, p_user_id: String) -> Result<Option<User>, Error> {
         let user = query_as::<_, User>("select * from user_entity where user_id = $1")
             .bind(p_user_id)
-            .fetch_optional(&*self.pool)
+            .fetch_optional(&self.pool)
             .await?;
 
         Ok(user)
@@ -114,7 +112,7 @@ impl UserRepository for UserRepositoryImpl {
     async fn find_by_identifier(&self, p_identifier: Uuid) -> Result<Option<User>, Error> {
         let user = query_as::<_, User>("select * from user_entity where identifier = $1")
             .bind(p_identifier)
-            .fetch_optional(&*self.pool)
+            .fetch_optional(&self.pool)
             .await?;
 
         Ok(user)
@@ -123,7 +121,7 @@ impl UserRepository for UserRepositoryImpl {
     async fn find_all(&self) -> Result<Vec<User>, Error> {
         let users =
             query_as::<_, User>("select * from user_entity order by first_name, last_name, id")
-                .fetch_all(&*self.pool)
+                .fetch_all(&self.pool)
                 .await?;
 
         Ok(users)
