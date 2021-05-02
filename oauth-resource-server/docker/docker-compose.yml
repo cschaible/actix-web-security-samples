@@ -7,7 +7,7 @@ services:
     ports:
       - "5433:5433"
     environment:
-      PGADMIN_DEFAULT_EMAIL: administr@t.r
+      PGADMIN_DEFAULT_EMAIL: administr@to.rs
       PGADMIN_DEFAULT_PASSWORD: secret
       PGADMIN_LISTEN_PORT: 5433
     depends_on:
